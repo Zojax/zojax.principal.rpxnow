@@ -1,0 +1,69 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:browser="http://namespaces.zope.org/browser"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   i18n_domain="zojax.principal.openid">
+  
+  <browser:page
+     for="*"
+     name="openIdSignIn"
+     permission="zope.Public"
+     class=".signin.OpenIdSignIn"/>
+
+  <browser:page
+     name="completeOpenIdSignIn"
+     for="*"
+     permission="zope.Public"
+     class=".signin.CompleteOpenIdSignIn"/>
+
+  <browser:page
+     name="successOpenIdSignIn"
+     for="*"
+     permission="zope.Public"
+     class=".signin.SuccessOpenIdSignIn"/>
+
+  <!-- remove principal -->
+  <zojax:preferenceGroup
+     id="membership.removeopenid"
+     title="Remove user"
+     for="zojax.principal.openid.interfaces.IOpenIdPrincipalMarker"
+     description="Remove user from portal."
+     schema=".remove.IPrincipalRemoverPreference"
+     tests=".remove.isNotSelf"
+     permission="zojax.ManagePrincipals" />
+
+  <zojax:pagelet
+     name="index.html"
+     for=".remove.IPrincipalRemoverPreference"
+     class=".remove.RemovePrincipalView"
+     template="remove.pt"
+     provides="zojax.preferences.browser.interfaces.IEdit"
+     permission="zojax.ManagePrincipals" />
+
+  <!-- login action -->
+  <zojax:pagelet
+     type="login.action"
+     for="..credentials.CredentialsPlugin"
+     template="login.pt"
+     class=".login.LoginAction"
+     permission="zope.Public" />
+
+  <!-- styles -->
+  <zojax:resourcedirectory
+     name="openid_images"
+     directory="images" />
+
+  <zojax:resourceinclude
+     name="zojax-principal-openid.css"
+     library="openid-auth"
+     type="stylesheet"
+     file="styles.css" filetype="zrt" />
+
+  <zojax:resourceinclude
+     name="zojax-principal-openid.js"
+     library="openid-auth"
+     type="javascript"
+     require="jquery"
+     file="openid-jquery.js" filetype="zrt" />
+
+</configure>

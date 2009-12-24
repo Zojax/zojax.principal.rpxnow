@@ -1,0 +1,71 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:zcml="http://namespaces.zope.org/zcml"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   i18n_domain="zojax.principal.openid">
+
+  <!-- credentials -->
+  <class class=".credentials.CredentialsPlugin">
+    <require
+       permission="zojax.ManagePrincipals"
+       interface="zojax.content.type.interfaces.IItem"
+       set_schema="zojax.content.type.interfaces.IItem"/>
+  </class>
+ 
+  <class class=".credentials.OpenIdCredentials">
+    <allow interface=".interfaces.IOpenIdCredentials" />
+  </class>
+
+  <subscriber handler=".credentials.installCredentialsPlugin" />
+  <subscriber handler=".credentials.uninstallCredentialsPlugin" />
+
+  <!-- authenticator plugin -->
+  <class class=".plugin.OpenIdPrincipal">
+    <allow attributes="identifier" />
+  </class>
+
+  <class class=".plugin.AuthenticatorPlugin">
+    <implements
+       interface="zope.app.container.interfaces.IContainerNamesContainer"/>
+    
+    <allow attributes="prefix"/>
+    
+    <require
+       permission="zojax.ManagePrincipals"
+       interface="zope.app.container.interfaces.IReadContainer" />
+  </class>
+
+  <!--utility
+     name="principal.openid"
+     component=".plugin.authenticatorFactory"/-->
+
+  <subscriber handler=".plugin.pluginRemovedHandler" />
+
+  <subscriber handler=".foundsubscriber.foundPrincipalCreated" />
+
+  <subscriber
+     for="zope.app.authentication.interfaces.IAuthenticatedPrincipalCreated"
+     handler=".foundsubscriber.foundPrincipalCreated" />
+
+  <adapter factory=".foundsubscriber.getInternalPrincipal" />
+
+  <!-- searchable content -->
+  <class class=".plugin.OpenIdPrincipal" 
+	 zcml:condition="installed zojax.content.type">
+    <implements interface="zojax.content.type.interfaces.ISearchableContent"/>
+  </class>
+
+  <!-- principal field -->
+  <class class=".plugin.OpenIdPrincipal"
+	 zcml:condition="installed zojax.principal.field">
+    <implements interface="zojax.principal.field.interfaces.IUser"/>
+
+    <require
+       permission="zope.View"
+       interface="zojax.principal.field.interfaces.IUser"/>
+  </class>   
+
+  <!-- browser views -->
+  <!--include package=".browser" /-->
+
+</configure>
