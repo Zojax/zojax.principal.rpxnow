@@ -23,18 +23,18 @@ from zope.app.component.hooks import getSite
 from zope.app.security.interfaces import \
     IAuthentication, IUnauthenticatedPrincipal
 
-from openid.consumer.consumer import Consumer
-from openid.extensions.sreg import SRegRequest
+from rpxnow.consumer.consumer import Consumer
+from rpxnow.extensions.sreg import SRegRequest
 
 from zojax.statusmessage.interfaces import IStatusMessage
 from zojax.authentication.interfaces import ILoginService
 
-from zojax.principal.openid.interfaces import _, IOpenIdAuthenticator
-from zojax.principal.openid.plugin import \
+from zojax.principal.rpxnow.interfaces import _, IRpxNowAuthenticator
+from zojax.principal.rpxnow.plugin import \
     SESSION_KEY, getReturnToURL, normalizeIdentifier
 
 
-class OpenIdSignIn(object):
+class RpxNowSignIn(object):
 
     def __call__(self):
         request = self.request
@@ -44,18 +44,18 @@ class OpenIdSignIn(object):
             request.response.redirect(siteURL)
             return u''
 
-        if not 'openid_form_submitted' in request:
+        if not 'rpxnow_form_submitted' in request:
             request.response.redirect(siteURL)
             return u''
 
-        identifier = request.get('openid_identifier')
+        identifier = request.get('rpxnow_identifier')
         if not identifier:
             IStatusMessage(request).add(
                 _(u"Please specify your OpenID identifier."))
             request.response.redirect(siteURL)
             return u''
 
-        authenticator = getUtility(IOpenIdAuthenticator)
+        authenticator = getUtility(IRpxNowAuthenticator)
         session = ISession(request)[SESSION_KEY]
         consumer = Consumer(session, authenticator.store)
 
@@ -71,16 +71,16 @@ class OpenIdSignIn(object):
         return u''
 
 
-class CompleteOpenIdSignIn(object):
+class CompleteRpxNowSignIn(object):
 
     def __call__(self):
         self.request.response.redirect(
-            u'%s/successOpenIdSignIn?processed=1'%absoluteURL(
+            u'%s/successRpxNowSignIn?processed=1'%absoluteURL(
                 getSite(), self.request))
         return u''
 
 
-class SuccessOpenIdSignIn(object):
+class SuccessRpxNowSignIn(object):
 
     def __call__(self, *args, **kw):
         request = self.request

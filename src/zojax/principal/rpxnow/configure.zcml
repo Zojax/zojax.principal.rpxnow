@@ -2,7 +2,7 @@
    xmlns="http://namespaces.zope.org/zope"
    xmlns:zcml="http://namespaces.zope.org/zcml"
    xmlns:zojax="http://namespaces.zope.org/zojax"
-   i18n_domain="zojax.principal.openid">
+   i18n_domain="zojax.principal.rpxnow">
 
   <!-- credentials -->
   <class class=".credentials.CredentialsPlugin">
@@ -12,15 +12,15 @@
        set_schema="zojax.content.type.interfaces.IItem"/>
   </class>
  
-  <class class=".credentials.OpenIdCredentials">
-    <allow interface=".interfaces.IOpenIdCredentials" />
+  <class class=".credentials.RpxNowCredentials">
+    <allow interface=".interfaces.IRpxNowCredentials" />
   </class>
 
   <subscriber handler=".credentials.installCredentialsPlugin" />
   <subscriber handler=".credentials.uninstallCredentialsPlugin" />
 
   <!-- authenticator plugin -->
-  <class class=".plugin.OpenIdPrincipal">
+  <class class=".plugin.RpxNowPrincipal">
     <allow attributes="identifier" />
   </class>
 
@@ -36,7 +36,7 @@
   </class>
 
   <!--utility
-     name="principal.openid"
+     name="principal.rpxnow"
      component=".plugin.authenticatorFactory"/-->
 
   <subscriber handler=".plugin.pluginRemovedHandler" />
@@ -50,13 +50,13 @@
   <adapter factory=".foundsubscriber.getInternalPrincipal" />
 
   <!-- searchable content -->
-  <class class=".plugin.OpenIdPrincipal" 
+  <class class=".plugin.RpxNowPrincipal" 
 	 zcml:condition="installed zojax.content.type">
     <implements interface="zojax.content.type.interfaces.ISearchableContent"/>
   </class>
 
   <!-- principal field -->
-  <class class=".plugin.OpenIdPrincipal"
+  <class class=".plugin.RpxNowPrincipal"
 	 zcml:condition="installed zojax.principal.field">
     <implements interface="zojax.principal.field.interfaces.IUser"/>
 

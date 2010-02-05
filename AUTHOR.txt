@@ -1,2 +1,1 @@
-Andrey Fedoseev (andrey.fedoseev <at> gmail <dot> com)
-Nikolay Kim (fafhrd91 <at> gmail <dot> com)
+Anatoly Bubenkov (bubenkoff <at> gmail <dot> com)

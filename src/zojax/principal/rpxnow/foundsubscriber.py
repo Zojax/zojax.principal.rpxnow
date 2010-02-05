@@ -21,24 +21,24 @@ from zope.app.security.interfaces import IAuthentication
 from zope.app.authentication.interfaces import IFoundPrincipalCreated
 from zope.app.authentication.interfaces import IPluggableAuthentication
 
-from interfaces import IOpenIdPrincipal, IOpenIdPrincipalMarker
-from interfaces import IOpenIdPrincipalInfo, IOpenIdUsersPlugin
+from interfaces import IRpxNowPrincipal, IRpxNowPrincipalMarker
+from interfaces import IRpxNowPrincipalInfo, IRpxNowUsersPlugin
 
 
 @component.adapter(IFoundPrincipalCreated)
 def foundPrincipalCreated(event):
     info = event.info
 
-    if IOpenIdPrincipalInfo.providedBy(event.info):
+    if IRpxNowPrincipalInfo.providedBy(event.info):
         principal = event.principal
         principal.identifier = info.identifier
         principal.title = info.title
         principal.description = u''
-        interface.alsoProvides(principal, IOpenIdPrincipalMarker)
+        interface.alsoProvides(principal, IRpxNowPrincipalMarker)
 
 
-@component.adapter(IOpenIdPrincipalMarker)
-@interface.implementer(IOpenIdPrincipal)
+@component.adapter(IRpxNowPrincipalMarker)
+@interface.implementer(IRpxNowPrincipal)
 def getInternalPrincipal(principal):
     auth = IPluggableAuthentication(getUtility(IAuthentication), None)
 
@@ -49,7 +49,7 @@ def getInternalPrincipal(principal):
             id = id[len(auth.prefix):]
 
             for name, plugin in auth.getAuthenticatorPlugins():
-                if IOpenIdUsersPlugin.providedBy(plugin):
+                if IRpxNowUsersPlugin.providedBy(plugin):
                     if id.startswith(plugin.prefix):
                         id = id[len(plugin.prefix):]
                         return plugin[id]

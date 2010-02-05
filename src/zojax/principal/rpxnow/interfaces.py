@@ -11,7 +11,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-""" zojax.principal.openid interfaces
+""" zojax.principal.rpxnow interfaces
 
 $Id$
 """
@@ -20,11 +20,11 @@ from zope.i18nmessageid.message import MessageFactory
 from zope.app.authentication.interfaces import IPrincipalInfo
 from zope.app.authentication.interfaces import IAuthenticatorPlugin
 
-_ = MessageFactory("zojax.principal.openid")
+_ = MessageFactory("zojax.principal.rpxnow")
 
 
-class IOpenIdPrincipal(interface.Interface):
-    """ openid principal """
+class IRpxNowPrincipal(interface.Interface):
+    """ rpxnow principal """
 
     title = schema.TextLine(
         title = _('Title'),
@@ -33,24 +33,24 @@ class IOpenIdPrincipal(interface.Interface):
     identifier = interface.Attribute('OpenID Identifier')
 
 
-class IOpenIdPrincipalInfo(IPrincipalInfo):
+class IRpxNowPrincipalInfo(IPrincipalInfo):
     """ principal info """
 
 
-class IOpenIdPrincipalMarker(interface.Interface):
-    """ openId principal marker """
+class IRpxNowPrincipalMarker(interface.Interface):
+    """ rpxNow principal marker """
 
 
-class IOpenIdAuthenticator(interface.Interface):
+class IRpxNowAuthenticator(interface.Interface):
 
     store = interface.Attribute(u"store")
 
-    def getPrincipalByOpenIdIdentifier(identifier):
+    def getPrincipalByRpxNowIdentifier(identifier):
         """ Get principal id by her OpenID identifier. Return None if
         principal with given identifier does not exist. """
 
 
-class IOpenIdCredentials(interface.Interface):
+class IRpxNowCredentials(interface.Interface):
     """ open id credentials info """
 
     request = interface.Attribute(u"request")
@@ -62,8 +62,8 @@ class IOpenIdCredentials(interface.Interface):
     parameters = schema.Dict(title=_(u"Query parameters"))
 
 
-class IOpenIdUsersPlugin(IOpenIdAuthenticator, IAuthenticatorPlugin):
-    """A container that contains openid principals."""
+class IRpxNowUsersPlugin(IRpxNowAuthenticator, IAuthenticatorPlugin):
+    """A container that contains rpxnow principals."""
 
     title = schema.TextLine(
         title = _('Title'),

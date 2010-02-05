@@ -19,7 +19,7 @@ from zope import interface, event
 from zope.security.proxy import removeSecurityProxy
 from zope.security.management import queryInteraction
 from zojax.statusmessage.interfaces import IStatusMessage
-from zojax.principal.openid.interfaces import _, IOpenIdPrincipal
+from zojax.principal.rpxnow.interfaces import _, IRpxNowPrincipal
 
 
 def isNotSelf(group):
@@ -45,7 +45,7 @@ class RemovePrincipalView(object):
         principal = self.context.__principal__
 
         if 'form.remove' in request:
-            internal = removeSecurityProxy(IOpenIdPrincipal(principal))
+            internal = removeSecurityProxy(IRpxNowPrincipal(principal))
             del internal.__parent__[internal.__name__]
 
             IStatusMessage(request).add(_('User has been removed.'))

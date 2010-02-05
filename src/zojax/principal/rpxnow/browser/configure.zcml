@@ -2,31 +2,31 @@
    xmlns="http://namespaces.zope.org/zope"
    xmlns:browser="http://namespaces.zope.org/browser"
    xmlns:zojax="http://namespaces.zope.org/zojax"
-   i18n_domain="zojax.principal.openid">
+   i18n_domain="zojax.principal.rpxnow">
   
   <browser:page
      for="*"
-     name="openIdSignIn"
+     name="rpxNowSignIn"
      permission="zope.Public"
-     class=".signin.OpenIdSignIn"/>
+     class=".signin.RpxNowSignIn"/>
 
   <browser:page
-     name="completeOpenIdSignIn"
+     name="completeRpxNowSignIn"
      for="*"
      permission="zope.Public"
-     class=".signin.CompleteOpenIdSignIn"/>
+     class=".signin.CompleteRpxNowSignIn"/>
 
   <browser:page
-     name="successOpenIdSignIn"
+     name="successRpxNowSignIn"
      for="*"
      permission="zope.Public"
-     class=".signin.SuccessOpenIdSignIn"/>
+     class=".signin.SuccessRpxNowSignIn"/>
 
   <!-- remove principal -->
   <zojax:preferenceGroup
-     id="membership.removeopenid"
+     id="membership.removerpxnow"
      title="Remove user"
-     for="zojax.principal.openid.interfaces.IOpenIdPrincipalMarker"
+     for="zojax.principal.rpxnow.interfaces.IRpxNowPrincipalMarker"
      description="Remove user from portal."
      schema=".remove.IPrincipalRemoverPreference"
      tests=".remove.isNotSelf"
@@ -50,20 +50,20 @@
 
   <!-- styles -->
   <zojax:resourcedirectory
-     name="openid_images"
+     name="rpxnow_images"
      directory="images" />
 
   <zojax:resourceinclude
-     name="zojax-principal-openid.css"
-     library="openid-auth"
+     name="zojax-principal-rpxnow.css"
+     library="rpxnow-auth"
      type="stylesheet"
      file="styles.css" filetype="zrt" />
 
   <zojax:resourceinclude
-     name="zojax-principal-openid.js"
-     library="openid-auth"
+     name="zojax-principal-rpxnow.js"
+     library="rpxnow-auth"
      type="javascript"
      require="jquery"
-     file="openid-jquery.js" filetype="zrt" />
+     file="rpxnow-jquery.js" filetype="zrt" />
 
 </configure>

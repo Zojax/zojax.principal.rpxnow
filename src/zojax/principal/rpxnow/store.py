@@ -20,9 +20,9 @@ from zc.blist import BList
 from BTrees.OOBTree import OOBTree
 from BTrees.OIBTree import OITreeSet
 
-from openid.association import Association
-from openid.store.nonce import SKEW
-from openid.store.interface import OpenIDStore
+from rpxnow.association import Association
+from rpxnow.store.nonce import SKEW
+from rpxnow.store.interface import OpenIDStore
 
 
 class ZopeStore(OpenIDStore):

@@ -28,15 +28,15 @@ from zope.app.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
 
 from zojax.authentication.interfaces import ICredentialsPlugin
 
-from interfaces import _, IOpenIdCredentials, IOpenIdUsersPlugin
+from interfaces import _, IRpxNowCredentials, IRpxNowUsersPlugin
 
 
-class OpenIdCredentials(object):
-    interface.implements(IOpenIdCredentials)
+class RpxNowCredentials(object):
+    interface.implements(IRpxNowCredentials)
 
     failed = False
     principalInfo = None
-    parameters = FieldProperty(IOpenIdCredentials['parameters'])
+    parameters = FieldProperty(IRpxNowCredentials['parameters'])
 
     def __init__(self, parameters):
         self.parameters = parameters
@@ -59,7 +59,7 @@ class CredentialsPlugin(Persistent):
         A return value of None indicates that no credentials could be found.
         Any other return value is treated as valid credentials.
         """
-        mode = request.get("openid.mode", None)
+        mode = request.get("rpxnow.mode", None)
 
         if mode == "id_res":
             # id_res means 'positive assertion' in OpenID, more commonly
@@ -67,7 +67,7 @@ class CredentialsPlugin(Persistent):
             parameters = {}
             for field, value in request.form.iteritems():
                 parameters[field] = value
-            return OpenIdCredentials(parameters)
+            return RpxNowCredentials(parameters)
 
         elif mode == "cancel":
             # cancel is a negative assertion in the OpenID protocol,
@@ -77,7 +77,7 @@ class CredentialsPlugin(Persistent):
         return None
 
 
-@component.adapter(IOpenIdUsersPlugin, IObjectAddedEvent)
+@component.adapter(IRpxNowUsersPlugin, IObjectAddedEvent)
 def installCredentialsPlugin(plugin, ev):
     auth = getUtility(IAuthentication)
 
@@ -85,22 +85,22 @@ def installCredentialsPlugin(plugin, ev):
     event.notify(ObjectCreatedEvent(plugin))
 
     auth = removeSecurityProxy(auth)
-    if 'credendials.openid' in auth:
-        del auth['credendials.openid']
+    if 'credendials.rpxnow' in auth:
+        del auth['credendials.rpxnow']
 
-    auth['credendials.openid'] = plugin
+    auth['credendials.rpxnow'] = plugin
     auth.credentialsPlugins = tuple(auth.credentialsPlugins) + \
-        ('credendials.openid',)
+        ('credendials.rpxnow',)
 
 
-@component.adapter(IOpenIdUsersPlugin, IObjectRemovedEvent)
+@component.adapter(IRpxNowUsersPlugin, IObjectRemovedEvent)
 def uninstallCredentialsPlugin(plugin, ev):
     auth = getUtility(IAuthentication)
 
     plugins = list(auth.credentialsPlugins)
-    if 'credendials.openid' in plugins:
-        plugins.remove('credendials.openid')
+    if 'credendials.rpxnow' in plugins:
+        plugins.remove('credendials.rpxnow')
         auth.credentialsPlugins = tuple(plugins)
 
-    if 'credendials.openid' in auth:
-        del auth['credendials.openid']
+    if 'credendials.rpxnow' in auth:
+        del auth['credendials.rpxnow']

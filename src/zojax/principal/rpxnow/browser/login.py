@@ -21,11 +21,11 @@ from zope.app.component.hooks import getSite
 
 class LoginAction(object):
 
-    id = u'openid.login'
+    id = u'rpxnow.login'
     order = 9
 
     def update(self):
-        self.loginURL = u'%s/@@openIdSignIn'%absoluteURL(
+        self.loginURL = u'%s/@@rpxNowSignIn'%absoluteURL(
             getSite(), self.request)
 
     def isProcessed(self):

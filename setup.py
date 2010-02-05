@@ -11,7 +11,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Setup for zojax.principal.openid package
+"""Setup for zojax.principal.rpxnow package
 
 $Id$
 """
@@ -24,9 +24,9 @@ def read(*rnames):
 version='0'
 
 
-setup(name = 'zojax.principal.openid',
+setup(name = 'zojax.principal.rpxnow',
       version = version,
-      description = "OpenId authentication module for zojax.",
+      description = "RpxNow authentication module for zojax.",
       long_description = (
           'Detailed Documentation\n' +
           '======================\n'
@@ -43,9 +43,9 @@ setup(name = 'zojax.principal.openid',
         'Operating System :: OS Independent',
         'Topic :: Internet :: WWW/HTTP',
         'Framework :: Zope3'],
-      keywords = 'Zope3, OpenId',
-      author = 'Andrey Fedoseev, Nikolay Kim',
-      author_email = 'andrey.fedoseev@gmail.com, fafhrd91@gmail.com',
+      keywords = 'Zope3, RpxNow',
+      author = 'Anatoly Bubenkov',
+      author_email = 'bubenkoff@gmail.com',
       url = '',
       license = 'ZPL 2.1',
       include_package_data = True,
@@ -54,7 +54,7 @@ setup(name = 'zojax.principal.openid',
       package_dir = {'':'src'},
       namespace_packages = ['zojax', 'zojax.principal'],
       install_requires = ['setuptools',
-                          'python-openid',
+                          'python-rpxnow',
                           'zc.blist',
                           'zope.session',
                           'zope.cachedescriptors',

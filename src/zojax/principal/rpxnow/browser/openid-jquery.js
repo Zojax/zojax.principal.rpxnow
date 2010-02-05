@@ -1,6 +1,6 @@
 /*
 Simple OpenID Plugin
-http://code.google.com/p/openid-selector/
+http://code.google.com/p/rpxnow-selector/
 
 This code is licenced under the New BSD License.
 */
@@ -17,19 +17,19 @@ var providers_large = {
     aol: {
         name: 'AOL',     
         label: 'Enter your AOL screenname.',
-        url: 'http://openid.aol.com/{username}/'
+        url: 'http://rpxnow.aol.com/{username}/'
     },
-    openid: {
+    rpxnow: {
         name: 'OpenID',     
         label: 'Enter your OpenID.',
         url: null
     }
 };
 var providers_small = {
-    myopenid: {
+    myrpxnow: {
         name: 'MyOpenID',
         label: 'Enter your MyOpenID username.',
-        url: 'http://{username}.myopenid.com/'
+        url: 'http://{username}.myrpxnow.com/'
     },
     livejournal: {
         name: 'LiveJournal',
@@ -79,40 +79,40 @@ var providers_small = {
 };
 var providers = $.extend({}, providers_large, providers_small);
 
-var openid = {
+var rpxnow = {
 
 	cookie_expires: 6*30,	// 6 months.
-	cookie_name: 'openid_provider',
+	cookie_name: 'rpxnow_provider',
 	cookie_path: '/',
 	
-	img_path: '@@/openid_images/',
+	img_path: '@@/rpxnow_images/',
 
 	input_id: null,
 	provider_url: null,
 	
     init: function(input_id) {
         
-        var openid_btns = $('#openid_btns');
+        var rpxnow_btns = $('#rpxnow_btns');
         
         this.input_id = input_id;
         
-        $('#openid_choice').show();
-        $('#openid_input_area').empty();
+        $('#rpxnow_choice').show();
+        $('#rpxnow_input_area').empty();
         
         // add box for each provider
         for (id in providers_large) {
         
-           	openid_btns.append(this.getBoxHTML(providers_large[id], 'large', '.gif'));
+           	rpxnow_btns.append(this.getBoxHTML(providers_large[id], 'large', '.gif'));
         }
         if (providers_small) {
-            openid_btns.append('<br/>');
+            rpxnow_btns.append('<br/>');
         	
 	    for (id in providers_small) {
-	        openid_btns.append(this.getBoxHTML(providers_small[id], 'small', '.ico'));
+	        rpxnow_btns.append(this.getBoxHTML(providers_small[id], 'small', '.ico'));
 	    }
         }
         
-        $('#openid_form').submit(this.submit);
+        $('#rpxnow_form').submit(this.submit);
         
         var box_id = this.readCookie();
         if (box_id) {
@@ -122,9 +122,9 @@ var openid = {
 
     getBoxHTML: function(provider, box_size, image_ext) {            
         var box_id = provider["name"].toLowerCase();
-        return '<a title="'+provider["name"]+'" href="javascript: openid.signin(\''+ box_id +'\');"' +
+        return '<a title="'+provider["name"]+'" href="javascript: rpxnow.signin(\''+ box_id +'\');"' +
         		' style="background: #FFF url(' + this.img_path + box_id + image_ext+') no-repeat center center" ' + 
-        		'class="' + box_id + ' openid_' + box_size + '_btn"></a>';    
+        		'class="' + box_id + ' rpxnow_' + box_size + '_btn"></a>';    
     
     },
 
@@ -143,39 +143,39 @@ var openid = {
 	if (provider['label']) {
 	    this.useInputBox(provider);
 	} else {
-	    this.setOpenIdUrl(provider['url']);
+	    this.setRpxNowUrl(provider['url']);
 	    if (! onload) {
-		$('#openid_form').submit();
+		$('#rpxnow_form').submit();
 	    }
 	}
     },
 
     /* Sign-in button click */
     submit: function() {        
-    	var url = openid.provider_url; 
+    	var url = rpxnow.provider_url; 
     	if (url) {
-    	    url = url.replace('{username}', $('#openid_username').val());
-    	    openid.setOpenIdUrl(url);
+    	    url = url.replace('{username}', $('#rpxnow_username').val());
+    	    rpxnow.setRpxNowUrl(url);
     	}
     	return true;
     },
-    setOpenIdUrl: function (url) {
+    setRpxNowUrl: function (url) {
         var hidden = $('#'+this.input_id);
     	if (hidden.length > 0) {
     	    hidden.attr('value', url);
     	} else {
-    	    $('#openid_form').append('<input type="hidden" id="' + this.input_id + '" name="' + this.input_id + '" value="'+url+'"/>');
+    	    $('#rpxnow_form').append('<input type="hidden" id="' + this.input_id + '" name="' + this.input_id + '" value="'+url+'"/>');
     	}
     },
 
     highlight: function (box_id) {	
     	// remove previous highlight.
-    	var highlight = $('#openid_highlight');
+    	var highlight = $('#rpxnow_highlight');
     	if (highlight) {
-    		highlight.replaceWith($('#openid_highlight a')[0]);
+    		highlight.replaceWith($('#rpxnow_highlight a')[0]);
     	}
     	// add new highlight.
-    	$('.'+box_id).wrap('<div id="openid_highlight"></div>');
+    	$('.'+box_id).wrap('<div id="rpxnow_highlight"></div>');
     },
 
     setCookie: function (value) {
@@ -198,10 +198,10 @@ var openid = {
     },
     useInputBox: function (provider) {
    	
-		var input_area = $('#openid_input_area');
+		var input_area = $('#rpxnow_input_area');
 		
 		var html = '';
-		var id = 'openid_username';
+		var id = 'rpxnow_username';
 		var value = '';
 		var label = provider['label'];
 		var style = '';
@@ -212,10 +212,10 @@ var openid = {
 		if (provider['name'] == 'OpenID') {
 			id = this.input_id;
 			value = 'http://';
-			style = 'background:#FFF url('+this.img_path+'openid-inputicon.gif) no-repeat scroll 0 50%; padding-left:18px;';
+			style = 'background:#FFF url('+this.img_path+'rpxnow-inputicon.gif) no-repeat scroll 0 50%; padding-left:18px;';
 		}
 		html += '<input id="'+id+'" type="text" style="'+style+'" name="'+id+'" value="'+value+'" />' + 
-					'<input id="openid_submit" type="submit" value="Sign-In"/>';
+					'<input id="rpxnow_submit" type="submit" value="Sign-In"/>';
 		
 		input_area.empty();
 		input_area.append(html);
@@ -225,5 +225,5 @@ var openid = {
 };
 
 $(document).ready(function() {
-    openid.init('openid_identifier');
+    rpxnow.init('rpxnow_identifier');
 });
