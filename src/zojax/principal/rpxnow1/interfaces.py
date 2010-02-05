@@ -23,46 +23,67 @@ from zope.app.authentication.interfaces import IAuthenticatorPlugin
 _ = MessageFactory("zojax.principal.rpxnow")
 
 
-class IRpxNowPrincipal(interface.Interface):
+class IRPXNowAuthenticationProduct(interface.Interface):
+    """ product """
+
+    siteId = schema.TextLine(title=_(u"Site id"),
+                             required=True,)
+
+    consumerKey = schema.TextLine(title=_(u"Consumer key"),
+                                  required=True,)
+
+    consumerSecret = schema.TextLine(title=_(u"Consumer secret"),
+                                     required=True,)
+
+    parentURL = schema.TextLine(title=_(u"Parent Url"),
+                                default=u'/',
+                                required=True,)
+
+    baseDomain = schema.TextLine(title=_(u"Base domain"),
+                                default=u'www.google.com',
+                                required=True,)
+
+    rpcURL = schema.TextLine(title=_(u"RPC url"),
+                                default=u'http://friendconnect.gmodules.com/ps/api/rpc',
+                                required=True,)
+
+    cookieNames = interface.Attribute(u"Cookie name")
+
+
+class IRPXNowPrincipal(interface.Interface):
     """ rpxnow principal """
 
     title = schema.TextLine(
         title = _('Title'),
         required = True)
 
-    identifier = interface.Attribute('RpxNow Identifier')
+    identifier = interface.Attribute('OpenID Identifier')
 
 
-class IRpxNowPrincipalInfo(IPrincipalInfo):
+class IRPXNowPrincipalInfo(IPrincipalInfo):
     """ principal info """
 
-
-class IRpxNowPrincipalMarker(interface.Interface):
-    """ rpxNow principal marker """
+    internalId = interface.Attribute('OpenID Identifier')
 
 
-class IRpxNowAuthenticator(interface.Interface):
+class IRPXNowPrincipalMarker(interface.Interface):
+    """ openId principal marker """
 
-    store = interface.Attribute(u"store")
 
-    def getPrincipalByRpxNowIdentifier(identifier):
-        """ Get principal id by her RpxNow identifier. Return None if
+class IRPXNowAuthenticator(interface.Interface):
+
+    def getPrincipalByRPXNowIdentifier(identifier):
+        """ Get principal id by her OpenID identifier. Return None if
         principal with given identifier does not exist. """
 
 
-class IRpxNowCredentials(interface.Interface):
+class IRPXNowCredentials(interface.Interface):
     """ open id credentials info """
 
-    request = interface.Attribute(u"request")
-
-    failed = interface.Attribute(u'Credentials failed')
-
-    principalInfo = interface.Attribute('Principal info')
-
-    parameters = schema.Dict(title=_(u"Query parameters"))
+    fcauth = interface.Attribute(u"fcauth")
 
 
-class IRpxNowUsersPlugin(IRpxNowAuthenticator, IAuthenticatorPlugin):
+class IRPXNowUsersPlugin(IRPXNowAuthenticator, IAuthenticatorPlugin):
     """A container that contains rpxnow principals."""
 
     title = schema.TextLine(

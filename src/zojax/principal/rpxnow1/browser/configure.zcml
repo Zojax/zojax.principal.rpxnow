@@ -3,30 +3,12 @@
    xmlns:browser="http://namespaces.zope.org/browser"
    xmlns:zojax="http://namespaces.zope.org/zojax"
    i18n_domain="zojax.principal.rpxnow">
-  
-  <browser:page
-     for="*"
-     name="rpxNowSignIn"
-     permission="zope.Public"
-     class=".signin.RpxNowSignIn"/>
-
-  <browser:page
-     name="completeRpxNowSignIn"
-     for="*"
-     permission="zope.Public"
-     class=".signin.CompleteRpxNowSignIn"/>
-
-  <browser:page
-     name="successRpxNowSignIn"
-     for="*"
-     permission="zope.Public"
-     class=".signin.SuccessRpxNowSignIn"/>
-
+ 
   <!-- remove principal -->
   <zojax:preferenceGroup
      id="membership.removerpxnow"
      title="Remove user"
-     for="zojax.principal.rpxnow.interfaces.IRpxNowPrincipalMarker"
+     for="zojax.principal.rpxnow.interfaces.IRPXNowPrincipalMarker"
      description="Remove user from portal."
      schema=".remove.IPrincipalRemoverPreference"
      tests=".remove.isNotSelf"
@@ -47,23 +29,5 @@
      template="login.pt"
      class=".login.LoginAction"
      permission="zope.Public" />
-
-  <!-- styles -->
-  <zojax:resourcedirectory
-     name="rpxnow_images"
-     directory="images" />
-
-  <zojax:resourceinclude
-     name="zojax-principal-rpxnow.css"
-     library="rpxnow-auth"
-     type="stylesheet"
-     file="styles.css" filetype="zrt" />
-
-  <zojax:resourceinclude
-     name="zojax-principal-rpxnow.js"
-     library="rpxnow-auth"
-     type="javascript"
-     require="jquery"
-     file="rpxnow-jquery.js" filetype="zrt" />
 
 </configure>

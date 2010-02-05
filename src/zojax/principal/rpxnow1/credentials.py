@@ -22,32 +22,22 @@ from zope.component import getUtility
 from zope.lifecycleevent import ObjectCreatedEvent
 from zope.schema.fieldproperty import FieldProperty
 from zope.security.proxy import removeSecurityProxy
-from zope.security.management import queryInteraction
 from zope.app.security.interfaces import IAuthentication
 from zope.app.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
 
 from zojax.authentication.interfaces import ICredentialsPlugin
+from zojax.authentication.factory import CredentialsPluginFactory
 
-from interfaces import _, IRpxNowCredentials, IRpxNowUsersPlugin
+from interfaces import _, IRPXNowCredentials, IRPXNowUsersPlugin, IRPXNowAuthenticationProduct
 
 
-class RpxNowCredentials(object):
-    interface.implements(IRpxNowCredentials)
+class RPXNowCredentials(object):
+    interface.implements(IRPXNowCredentials)
 
-    failed = False
-    principalInfo = None
-    parameters = FieldProperty(IRpxNowCredentials['parameters'])
+    fcauth = None
 
-    def __init__(self, parameters):
-        self.parameters = parameters
-
-    @property
-    def request(self):
-        interaction = queryInteraction()
-
-        if interaction is not None:
-            for participation in interaction.participations:
-                return participation
+    def __init__(self, fcauth):
+        self.fcauth = fcauth
 
 
 class CredentialsPlugin(Persistent):
@@ -59,25 +49,22 @@ class CredentialsPlugin(Persistent):
         A return value of None indicates that no credentials could be found.
         Any other return value is treated as valid credentials.
         """
-        mode = request.get("rpxnow.mode", None)
+        product = getUtility(IRPXNowAuthenticationProduct)
+        cookie = request.getCookies().get(product.cookieNames[0])
 
-        if mode == "id_res":
-            # id_res means 'positive assertion' in RpxNow, more commonly
-            # described as 'positive authentication'
-            parameters = {}
-            for field, value in request.form.iteritems():
-                parameters[field] = value
-            return RpxNowCredentials(parameters)
-
-        elif mode == "cancel":
-            # cancel is a negative assertion in the RpxNow protocol,
-            # which means the user did not authorize correctly.
-            return None
+        if cookie:
+            return RPXNowCredentials(cookie)
 
         return None
 
 
-@component.adapter(IRpxNowUsersPlugin, IObjectAddedEvent)
+credentialsFactory = CredentialsPluginFactory(
+    "credentials.rpxnow", CredentialsPlugin, (),
+    _(u'RPX Now credentials plugin'),
+    u'')
+
+
+@component.adapter(IRPXNowUsersPlugin, IObjectAddedEvent)
 def installCredentialsPlugin(plugin, ev):
     auth = getUtility(IAuthentication)
 
@@ -93,7 +80,7 @@ def installCredentialsPlugin(plugin, ev):
         ('credendials.rpxnow',)
 
 
-@component.adapter(IRpxNowUsersPlugin, IObjectRemovedEvent)
+@component.adapter(IRPXNowUsersPlugin, IObjectRemovedEvent)
 def uninstallCredentialsPlugin(plugin, ev):
     auth = getUtility(IAuthentication)
 

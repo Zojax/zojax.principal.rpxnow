@@ -15,6 +15,7 @@
 
 $Id$
 """
+import logging
 from persistent import Persistent
 
 from zope import interface, component, event
@@ -32,30 +33,29 @@ from zope.app.container.interfaces import INameChooser, IObjectRemovedEvent
 from zope.app.security.interfaces import IAuthentication, PrincipalLookupError
 from zope.app.authentication.interfaces import IFoundPrincipalFactory
 
-from rpxnow.extensions.sreg import SRegResponse
-from rpxnow.consumer.consumer import Consumer, SuccessResponse
+import opensocial
 
+from zojax.cache.interfaces import ICacheConfiglet
 from zojax.authentication.factory import AuthenticatorPluginFactory
 from zojax.authentication.interfaces import PrincipalRemovingEvent
 from zojax.authentication.interfaces import PrincipalInitializationFailed
 from zojax.statusmessage.interfaces import IStatusMessage
 from zojax.principal.registration.interfaces import IPortalRegistration
 
-from zojax.principal.rpxnow.interfaces import _, IRpxNowPrincipal
+from zojax.principal.rpxnow.interfaces import _, IRPXNowPrincipal
 from zojax.principal.rpxnow.interfaces import \
-    IRpxNowCredentials, IRpxNowUsersPlugin, IRpxNowPrincipalInfo
-from zojax.principal.rpxnow.store import ZopeStore
+    IRPXNowCredentials, IRPXNowUsersPlugin, IRPXNowPrincipalInfo, \
+    IRPXNowAuthenticationProduct
 
 SESSION_KEY = 'zojax.principal.rpxnow'
 CHALLENGE_INITIATED_MARKER = '_rpxnow_challenge_initiated'
 
+logger = logging.getLogger('zojax.principal.rpxnow')
+_marker = object()
 
-class RpxNowPrincipal(Persistent, Location):
-    interface.implements(IRpxNowPrincipal)
 
-    @property
-    def title(self):
-        return u'rpxnow%s'%self.__name__
+class RPXNowPrincipal(Persistent, Location):
+    interface.implements(IRPXNowPrincipal)
 
     @Lazy
     def id(self):
@@ -64,8 +64,8 @@ class RpxNowPrincipal(Persistent, Location):
         return self.id
 
 
-class RpxNowPrincipalInfo(object):
-    interface.implements(IRpxNowPrincipalInfo)
+class RPXNowPrincipalInfo(object):
+    interface.implements(IRPXNowPrincipalInfo)
 
     description = u''
 
@@ -76,11 +76,11 @@ class RpxNowPrincipalInfo(object):
         self.internalId = internal.__name__
 
     def __repr__(self):
-        return 'RpxNowPrincipalInfo(%r)' % self.id
+        return 'RPXNowPrincipalInfo(%r)' % self.id
 
 
 def getReturnToURL(request):
-    return absoluteURL(getSite(), request) + '/@@completeRpxNowSignIn'
+    return absoluteURL(getSite(), request) + '/@@completeRPXNowSignIn'
 
 
 def normalizeIdentifier(identifier):
@@ -97,15 +97,43 @@ def normalizeIdentifier(identifier):
 
 
 class AuthenticatorPlugin(BTreeContainer):
-    interface.implements(IRpxNowUsersPlugin, INameChooser)
+    interface.implements(IRPXNowUsersPlugin, INameChooser)
 
     def __init__(self, prefix=u'zojax.rpxnow.'):
-        self.store = ZopeStore()
         self.prefix = unicode(prefix)
         self.__name_chooser_counter = 1
         self.__id_by_identifier = self._newContainerData()
 
         super(AuthenticatorPlugin, self).__init__()
+
+    def _getRPXNowUserInfo(self, fcauth):
+        product = component.getUtility(IRPXNowAuthenticationProduct)
+        cache = component.getUtility(ICacheConfiglet, context=self)
+        ob = ('zojax.principal.rpxnow', '_getRPXNowUserInfo')
+        key = {'fcauth': fcauth}
+        result = cache.query(ob, key, _marker)
+        if result is _marker:
+            params = {
+              "server_rpc_base" : product.rpcURL,
+              "security_token" : fcauth,
+              "security_token_param" : "fcauth",
+            }
+            config = opensocial.ContainerConfig(**params)
+            self.__container = opensocial.ContainerContext(config)
+
+            batch = opensocial.RequestBatch()
+            args = [ "@me", ['@all']]
+            request = opensocial.request.FetchPersonRequest(*args)
+            batch.add_request("viewer", request)
+
+            try:
+              batch.send(self.__container)
+              result = batch.get("viewer")
+            except:
+              logger.exception("Problem getting the viewer")
+              result = False
+            cache.set(result, ob, key)
+        return result
 
     def authenticateCredentials(self, credentials):
         """Authenticates credentials.
@@ -114,56 +142,31 @@ class AuthenticatorPlugin(BTreeContainer):
         IPrincipalInfo. If the plugin cannot authenticate the credentials,
         returns None.
         """
-        if not IRpxNowCredentials.providedBy(credentials):
+        if not IRPXNowCredentials.providedBy(credentials):
             return None
 
-        if credentials.failed:
+        fcauth = credentials.fcauth
+
+        if fcauth is None:
             return None
 
-        if credentials.principalInfo is not None \
-                and credentials.principalInfo.internalId in self:
-            return credentials.principalInfo
+        info  = self._getRPXNowUserInfo(fcauth)
 
-        request = credentials.request
+        principalId = self.getPrincipalByRPXNowIdentifier(info['id'])
+        if principalId is None:
+            # Principal does not exist.
+            principal = self._createPrincipal(info)
+            name = INameChooser(self).chooseName('', principal)
+            self[name] = principal
+            principalId = self.getPrincipalByRPXNowIdentifier(info['id'])
 
-        consumer = Consumer(ISession(request)[SESSION_KEY], self.store)
+        return self.principalInfo(self.prefix + principalId)
 
-        returnto = credentials.parameters.get(
-            'rpxnow.return_to', getReturnToURL(request))
-        response = consumer.complete(
-            credentials.parameters, returnto.split('?')[0])
-
-        if isinstance(response, SuccessResponse):
-            identifier = normalizeIdentifier(response.identity_url)
-            principalId = self.getPrincipalByRpxNowIdentifier(identifier)
-            if principalId is None:
-                # Principal does not exist
-                principal = RpxNowPrincipal()
-                principal.identifier = identifier
-
-                sregResponse = SRegResponse.fromSuccessResponse(response)
-
-                name = INameChooser(self).chooseName('', principal)
-                self[name] = principal
-                principalId = self.getPrincipalByRpxNowIdentifier(identifier)
-
-                # register principal in portal registration tool
-                auth = getUtility(IAuthentication)
-                pid = auth.prefix + self.prefix + name
-                try:
-                    principal = auth.getPrincipal(pid)
-                    getUtility(IPortalRegistration).registerPrincipal(principal)
-                except PrincipalLookupError:
-                    pass
-
-            principalInfo = self.principalInfo(self.prefix + principalId)
-            credentials.principalInfo = principalInfo
-            return principalInfo
-
-        else:
-            raise PrincipalInitializationFailed(response.message)
-
-        return None
+    def _createPrincipal(self, userInfo):
+        principal = RPXNowPrincipal()
+        principal.title = userInfo['displayName']
+        principal.identifier = userInfo['id']
+        return principal
 
     def principalInfo(self, id):
         """Returns an IPrincipalInfo object for the specified principal id.
@@ -173,10 +176,10 @@ class AuthenticatorPlugin(BTreeContainer):
         if id.startswith(self.prefix):
             internal = self.get(id[len(self.prefix):])
             if internal is not None:
-                return RpxNowPrincipalInfo(id, internal)
+                return RPXNowPrincipalInfo(id, internal)
 
-    def getPrincipalByRpxNowIdentifier(self, identifier):
-        """ return principal info by RpxNow Identifier """
+    def getPrincipalByRPXNowIdentifier(self, identifier):
+        """ return principal info by OpenID Identifier """
         if identifier in self.__id_by_identifier:
             return self.__id_by_identifier.get(identifier)
 
@@ -223,7 +226,7 @@ class AuthenticatorPlugin(BTreeContainer):
         internal = self[id]
 
         auth = getUtility(IAuthentication)
-        info = RpxNowPrincipalInfo(self.prefix+id, internal)
+        info = RPXNowPrincipalInfo(self.prefix+id, internal)
         info.credentialsPlugin = None
         info.authenticatorPlugin = self
         principal = IFoundPrincipalFactory(info)(auth)
@@ -236,7 +239,7 @@ class AuthenticatorPlugin(BTreeContainer):
         del self.__id_by_identifier[internal.identifier]
 
 
-@component.adapter(IRpxNowUsersPlugin, IObjectRemovedEvent)
+@component.adapter(IRPXNowUsersPlugin, IObjectRemovedEvent)
 def pluginRemovedHandler(plugin, event):
     plugin = removeAllProxies(plugin)
 
@@ -245,7 +248,7 @@ def pluginRemovedHandler(plugin, event):
 
 
 authenticatorFactory = AuthenticatorPluginFactory(
-    "principal.rpxnow", AuthenticatorPlugin, ((IRpxNowUsersPlugin, ''),),
-    _(u'RpxNow plugin'),
+    "principal.rpxnow", AuthenticatorPlugin, ((IRPXNowUsersPlugin, ''),),
+    _(u'RPX Now plugin'),
     _(u'This plugin allow use rpxnow login '
       u'like google, yahoo, lifejournal and many others'))

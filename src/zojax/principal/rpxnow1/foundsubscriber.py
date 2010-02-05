@@ -17,28 +17,33 @@ $Id$
 """
 from zope import interface, component
 from zope.component import getUtility
+from zope.security.management import queryInteraction
 from zope.app.security.interfaces import IAuthentication
 from zope.app.authentication.interfaces import IFoundPrincipalCreated
 from zope.app.authentication.interfaces import IPluggableAuthentication
+from zope.security.management import queryInteraction
 
-from interfaces import IRpxNowPrincipal, IRpxNowPrincipalMarker
-from interfaces import IRpxNowPrincipalInfo, IRpxNowUsersPlugin
+from zojax.authentication.interfaces import IPrincipalLoggingOutEvent
+
+from interfaces import IRPXNowPrincipal, IRPXNowPrincipalMarker
+from interfaces import IRPXNowPrincipalInfo, IRPXNowUsersPlugin
+from interfaces import IRPXNowAuthenticationProduct
 
 
 @component.adapter(IFoundPrincipalCreated)
 def foundPrincipalCreated(event):
     info = event.info
 
-    if IRpxNowPrincipalInfo.providedBy(event.info):
+    if IRPXNowPrincipalInfo.providedBy(event.info):
         principal = event.principal
         principal.identifier = info.identifier
         principal.title = info.title
         principal.description = u''
-        interface.alsoProvides(principal, IRpxNowPrincipalMarker)
+        interface.alsoProvides(principal, IRPXNowPrincipalMarker)
 
 
-@component.adapter(IRpxNowPrincipalMarker)
-@interface.implementer(IRpxNowPrincipal)
+@component.adapter(IRPXNowPrincipalMarker)
+@interface.implementer(IRPXNowPrincipal)
 def getInternalPrincipal(principal):
     auth = IPluggableAuthentication(getUtility(IAuthentication), None)
 
@@ -49,7 +54,22 @@ def getInternalPrincipal(principal):
             id = id[len(auth.prefix):]
 
             for name, plugin in auth.getAuthenticatorPlugins():
-                if IRpxNowUsersPlugin.providedBy(plugin):
+                if IRPXNowUsersPlugin.providedBy(plugin):
                     if id.startswith(plugin.prefix):
                         id = id[len(plugin.prefix):]
                         return plugin[id]
+
+
+@component.adapter(IPrincipalLoggingOutEvent)
+def principalLoggingOut(event):
+    if IRPXNowPrincipalMarker.providedBy(event.principal):
+        request = None
+        interaction = queryInteraction()
+
+        if interaction is not None:
+            for participation in interaction.participations:
+                request =  participation
+        if request is not None:
+            product = getUtility(IRPXNowAuthenticationProduct)
+            for cookie in product.cookieNames:
+                request.response.expireCookie(cookie)

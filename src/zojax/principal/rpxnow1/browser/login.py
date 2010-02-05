@@ -15,18 +15,20 @@
 
 $Id$
 """
+from zope.component import getUtility
 from zope.traversing.browser import absoluteURL
 from zope.app.component.hooks import getSite
 
+from zojax.principal.rpxnow.interfaces import IRPXNowAuthenticationProduct
 
 class LoginAction(object):
 
     id = u'rpxnow.login'
-    order = 9
+    order = 20
 
     def update(self):
-        self.loginURL = u'%s/@@rpxNowSignIn'%absoluteURL(
-            getSite(), self.request)
+        self.siteId = getUtility(IRPXNowAuthenticationProduct).siteId
+        self.successUrl = '%s/login-success.html'%absoluteURL(getSite(), self.request)
 
     def isProcessed(self):
         return False
