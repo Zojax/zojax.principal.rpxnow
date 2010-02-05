@@ -16,6 +16,8 @@
 $Id$
 """
 import logging
+import urllib
+import simplejson
 from persistent import Persistent
 
 from zope import interface, component, event
@@ -33,8 +35,6 @@ from zope.app.container.interfaces import INameChooser, IObjectRemovedEvent
 from zope.app.security.interfaces import IAuthentication, PrincipalLookupError
 from zope.app.authentication.interfaces import IFoundPrincipalFactory
 
-import opensocial
-
 from zojax.cache.interfaces import ICacheConfiglet
 from zojax.authentication.factory import AuthenticatorPluginFactory
 from zojax.authentication.interfaces import PrincipalRemovingEvent
@@ -42,13 +42,10 @@ from zojax.authentication.interfaces import PrincipalInitializationFailed
 from zojax.statusmessage.interfaces import IStatusMessage
 from zojax.principal.registration.interfaces import IPortalRegistration
 
-from zojax.principal.rpxnow.interfaces import _, IRPXNowPrincipal
-from zojax.principal.rpxnow.interfaces import \
+from interfaces import _, IRPXNowPrincipal
+from interfaces import \
     IRPXNowCredentials, IRPXNowUsersPlugin, IRPXNowPrincipalInfo, \
-    IRPXNowAuthenticationProduct
-
-SESSION_KEY = 'zojax.principal.rpxnow'
-CHALLENGE_INITIATED_MARKER = '_rpxnow_challenge_initiated'
+    IRPXNowAuthenticationProduct, SESSION_KEY
 
 logger = logging.getLogger('zojax.principal.rpxnow')
 _marker = object()
@@ -79,23 +76,6 @@ class RPXNowPrincipalInfo(object):
         return 'RPXNowPrincipalInfo(%r)' % self.id
 
 
-def getReturnToURL(request):
-    return absoluteURL(getSite(), request) + '/@@completeRPXNowSignIn'
-
-
-def normalizeIdentifier(identifier):
-    identifier = identifier.lower()
-
-    if not identifier.startswith('http://') and \
-            not identifier.startswith('https://'):
-        identifier = 'http://' + identifier
-
-    if not identifier.endswith('/'):
-        identifier = identifier + '/'
-
-    return unicode(identifier)
-
-
 class AuthenticatorPlugin(BTreeContainer):
     interface.implements(IRPXNowUsersPlugin, INameChooser)
 
@@ -106,32 +86,27 @@ class AuthenticatorPlugin(BTreeContainer):
 
         super(AuthenticatorPlugin, self).__init__()
 
-    def _getRPXNowUserInfo(self, fcauth):
+    def _getRPXNowUserInfo(self, token):
         product = component.getUtility(IRPXNowAuthenticationProduct)
         cache = component.getUtility(ICacheConfiglet, context=self)
         ob = ('zojax.principal.rpxnow', '_getRPXNowUserInfo')
-        key = {'fcauth': fcauth}
+        key = {'token': token}
         result = cache.query(ob, key, _marker)
-        if result is _marker:
+        if result is _marker or not result:
             params = {
-              "server_rpc_base" : product.rpcURL,
-              "security_token" : fcauth,
-              "security_token_param" : "fcauth",
+              "apiKey" : product.apiKey,
+              "token" : token,
+              "format" : "json",
             }
-            config = opensocial.ContainerConfig(**params)
-            self.__container = opensocial.ContainerContext(config)
-
-            batch = opensocial.RequestBatch()
-            args = [ "@me", ['@all']]
-            request = opensocial.request.FetchPersonRequest(*args)
-            batch.add_request("viewer", request)
-
             try:
-              batch.send(self.__container)
-              result = batch.get("viewer")
+                result = simplejson.loads(urllib.urlopen('%s/auth_info'%product.rpcURL, urllib.urlencode(params)).read())
+                if result['stat'] != 'ok':
+                    return False
+                else:
+                    result = result['profile']
             except:
-              logger.exception("Problem getting the viewer")
-              result = False
+                logger.exception("Problem getting the response")
+                return False
             cache.set(result, ob, key)
         return result
 
@@ -145,27 +120,29 @@ class AuthenticatorPlugin(BTreeContainer):
         if not IRPXNowCredentials.providedBy(credentials):
             return None
 
-        fcauth = credentials.fcauth
+        token = credentials.token
 
-        if fcauth is None:
+        if token is None:
             return None
 
-        info  = self._getRPXNowUserInfo(fcauth)
+        info  = self._getRPXNowUserInfo(token)
+        if not info:
+            return None
 
-        principalId = self.getPrincipalByRPXNowIdentifier(info['id'])
+        principalId = self.getPrincipalByRPXNowIdentifier(info['identifier'])
         if principalId is None:
             # Principal does not exist.
             principal = self._createPrincipal(info)
             name = INameChooser(self).chooseName('', principal)
             self[name] = principal
-            principalId = self.getPrincipalByRPXNowIdentifier(info['id'])
+            principalId = self.getPrincipalByRPXNowIdentifier(info['identifier'])
 
         return self.principalInfo(self.prefix + principalId)
 
     def _createPrincipal(self, userInfo):
         principal = RPXNowPrincipal()
-        principal.title = userInfo['displayName']
-        principal.identifier = userInfo['id']
+        principal.title = userInfo['name']['formatted']
+        principal.identifier = userInfo['identifier']
         return principal
 
     def principalInfo(self, id):

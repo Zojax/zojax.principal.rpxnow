@@ -22,12 +22,13 @@ from zope.app.security.interfaces import IAuthentication
 from zope.app.authentication.interfaces import IFoundPrincipalCreated
 from zope.app.authentication.interfaces import IPluggableAuthentication
 from zope.security.management import queryInteraction
+from zope.session.interfaces import ISession
 
 from zojax.authentication.interfaces import IPrincipalLoggingOutEvent
 
 from interfaces import IRPXNowPrincipal, IRPXNowPrincipalMarker
 from interfaces import IRPXNowPrincipalInfo, IRPXNowUsersPlugin
-from interfaces import IRPXNowAuthenticationProduct
+from interfaces import IRPXNowAuthenticationProduct, SESSION_KEY
 
 
 @component.adapter(IFoundPrincipalCreated)
@@ -70,6 +71,4 @@ def principalLoggingOut(event):
             for participation in interaction.participations:
                 request =  participation
         if request is not None:
-            product = getUtility(IRPXNowAuthenticationProduct)
-            for cookie in product.cookieNames:
-                request.response.expireCookie(cookie)
+            ISession(request)[SESSION_KEY]['token'] = None

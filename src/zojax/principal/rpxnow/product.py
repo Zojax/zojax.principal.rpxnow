@@ -20,10 +20,6 @@ from zope import interface
 
 class RPXNowAuthenticationProduct(object):
 
-    @property
-    def cookieNames(self):
-        return ["fcauth%s" % self.siteId, "fcauth%s-s" % self.siteId]
-
     def install(self):
         super(RPXNowAuthenticationProduct, self).install()
         self.update()

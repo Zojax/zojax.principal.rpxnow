@@ -24,20 +24,21 @@ from zope.schema.fieldproperty import FieldProperty
 from zope.security.proxy import removeSecurityProxy
 from zope.app.security.interfaces import IAuthentication
 from zope.app.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
+from zope.session.interfaces import ISession
 
 from zojax.authentication.interfaces import ICredentialsPlugin
 from zojax.authentication.factory import CredentialsPluginFactory
 
-from interfaces import _, IRPXNowCredentials, IRPXNowUsersPlugin, IRPXNowAuthenticationProduct
+from interfaces import _, SESSION_KEY, IRPXNowCredentials, IRPXNowUsersPlugin, IRPXNowAuthenticationProduct
 
 
 class RPXNowCredentials(object):
     interface.implements(IRPXNowCredentials)
 
-    fcauth = None
+    token = None
 
-    def __init__(self, fcauth):
-        self.fcauth = fcauth
+    def __init__(self, token):
+        self.token = token
 
 
 class CredentialsPlugin(Persistent):
@@ -49,12 +50,9 @@ class CredentialsPlugin(Persistent):
         A return value of None indicates that no credentials could be found.
         Any other return value is treated as valid credentials.
         """
-        product = getUtility(IRPXNowAuthenticationProduct)
-        cookie = request.getCookies().get(product.cookieNames[0])
-
-        if cookie:
-            return RPXNowCredentials(cookie)
-
+        token = ISession(request)[SESSION_KEY].get('token')
+        if token:
+            return RPXNowCredentials(token)
         return None
 
 

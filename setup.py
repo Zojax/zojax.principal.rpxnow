@@ -54,7 +54,7 @@ setup(name = 'zojax.principal.rpxnow',
       package_dir = {'':'src'},
       namespace_packages = ['zojax', 'zojax.principal'],
       install_requires = ['setuptools',
-                          'zc.blist',
+                          'simplejson'
                           'zope.session',
                           'zope.cachedescriptors',
                           'zope.app.container',

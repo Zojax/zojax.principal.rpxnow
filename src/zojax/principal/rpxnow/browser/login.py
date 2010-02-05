@@ -15,6 +15,7 @@
 
 $Id$
 """
+import urllib
 from zope.component import getUtility
 from zope.traversing.browser import absoluteURL
 from zope.app.component.hooks import getSite
@@ -24,11 +25,13 @@ from zojax.principal.rpxnow.interfaces import IRPXNowAuthenticationProduct
 class LoginAction(object):
 
     id = u'rpxnow.login'
-    order = 20
+    order = 30
 
     def update(self):
-        self.siteId = getUtility(IRPXNowAuthenticationProduct).siteId
-        self.successUrl = '%s/login-success.html'%absoluteURL(getSite(), self.request)
+        siteURL = absoluteURL(getSite(), self.request)
+        self.successUrl = '%s/login-success.html'%siteURL
+        self.signInLink = 'https://zojax-eval.rpxnow.com/openid/v2/signin?%s' % \
+                        urllib.urlencode(dict(token_url='%s/rpxNowSignIn'%siteURL))
 
     def isProcessed(self):
         return False

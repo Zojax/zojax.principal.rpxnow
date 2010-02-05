@@ -20,31 +20,19 @@ from zope.i18nmessageid.message import MessageFactory
 from zope.app.authentication.interfaces import IPrincipalInfo
 from zope.app.authentication.interfaces import IAuthenticatorPlugin
 
+
 _ = MessageFactory("zojax.principal.rpxnow")
+SESSION_KEY = 'zojax.principal.rpxnow'
 
 
 class IRPXNowAuthenticationProduct(interface.Interface):
     """ product """
 
-    siteId = schema.TextLine(title=_(u"Site id"),
-                             required=True,)
-
-    consumerKey = schema.TextLine(title=_(u"Consumer key"),
+    apiKey = schema.TextLine(title=_(u"API key"),
                                   required=True,)
 
-    consumerSecret = schema.TextLine(title=_(u"Consumer secret"),
-                                     required=True,)
-
-    parentURL = schema.TextLine(title=_(u"Parent Url"),
-                                default=u'/',
-                                required=True,)
-
-    baseDomain = schema.TextLine(title=_(u"Base domain"),
-                                default=u'www.google.com',
-                                required=True,)
-
     rpcURL = schema.TextLine(title=_(u"RPC url"),
-                                default=u'http://friendconnect.gmodules.com/ps/api/rpc',
+                                default=u'http://rpxnow.com/api/v2',
                                 required=True,)
 
     cookieNames = interface.Attribute(u"Cookie name")
@@ -80,7 +68,7 @@ class IRPXNowAuthenticator(interface.Interface):
 class IRPXNowCredentials(interface.Interface):
     """ open id credentials info """
 
-    fcauth = interface.Attribute(u"fcauth")
+    token = interface.Attribute(u"token")
 
 
 class IRPXNowUsersPlugin(IRPXNowAuthenticator, IAuthenticatorPlugin):
