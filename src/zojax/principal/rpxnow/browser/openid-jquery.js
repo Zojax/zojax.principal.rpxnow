@@ -1,5 +1,5 @@
 /*
-Simple OpenID Plugin
+Simple RpxNow Plugin
 http://code.google.com/p/rpxnow-selector/
 
 This code is licenced under the New BSD License.
@@ -20,15 +20,15 @@ var providers_large = {
         url: 'http://rpxnow.aol.com/{username}/'
     },
     rpxnow: {
-        name: 'OpenID',     
-        label: 'Enter your OpenID.',
+        name: 'RpxNow',     
+        label: 'Enter your RpxNow.',
         url: null
     }
 };
 var providers_small = {
     myrpxnow: {
-        name: 'MyOpenID',
-        label: 'Enter your MyOpenID username.',
+        name: 'MyRpxNow',
+        label: 'Enter your MyRpxNow username.',
         url: 'http://{username}.myrpxnow.com/'
     },
     livejournal: {
@@ -209,7 +209,7 @@ var rpxnow = {
 		if (label) {
 			html = '<p>' + label + '</p>';
 		}
-		if (provider['name'] == 'OpenID') {
+		if (provider['name'] == 'RpxNow') {
 			id = this.input_id;
 			value = 'http://';
 			style = 'background:#FFF url('+this.img_path+'rpxnow-inputicon.gif) no-repeat scroll 0 50%; padding-left:18px;';

@@ -62,7 +62,7 @@ class CredentialsPlugin(Persistent):
         mode = request.get("rpxnow.mode", None)
 
         if mode == "id_res":
-            # id_res means 'positive assertion' in OpenID, more commonly
+            # id_res means 'positive assertion' in RpxNow, more commonly
             # described as 'positive authentication'
             parameters = {}
             for field, value in request.form.iteritems():
@@ -70,7 +70,7 @@ class CredentialsPlugin(Persistent):
             return RpxNowCredentials(parameters)
 
         elif mode == "cancel":
-            # cancel is a negative assertion in the OpenID protocol,
+            # cancel is a negative assertion in the RpxNow protocol,
             # which means the user did not authorize correctly.
             return None
 

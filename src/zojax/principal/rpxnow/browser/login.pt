@@ -2,7 +2,7 @@
       tal:define="dummy resourcepackage:rpxnow-auth">
   <input type="hidden" name="rpxnow_form_submitted" value="1" />
   <fieldset>
-    <legend>Sign-in with OpenID</legend>
+    <legend>Sign-in with RpxNow</legend>
 
     <div id="rpxnow_choice">
       <p>Please click your account provider:</p>
@@ -17,8 +17,8 @@
       </div>
     </div>
     <noscript>
-      <p>OpenID is service that allows you to log-on to many different websites using a single indentity.
-	Find out <a href="http://rpxnow.net/what/">more about OpenID</a> and <a href="http://rpxnow.net/get/">how to get an OpenID enabled account</a>.</p>
+      <p>RpxNow is service that allows you to log-on to many different websites using a single indentity.
+	Find out <a href="http://rpxnow.net/what/">more about RpxNow</a> and <a href="http://rpxnow.net/get/">how to get an RpxNow enabled account</a>.</p>
     </noscript>
   </fieldset>
 </form>

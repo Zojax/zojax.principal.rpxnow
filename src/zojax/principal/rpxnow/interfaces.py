@@ -30,7 +30,7 @@ class IRpxNowPrincipal(interface.Interface):
         title = _('Title'),
         required = True)
 
-    identifier = interface.Attribute('OpenID Identifier')
+    identifier = interface.Attribute('RpxNow Identifier')
 
 
 class IRpxNowPrincipalInfo(IPrincipalInfo):
@@ -46,7 +46,7 @@ class IRpxNowAuthenticator(interface.Interface):
     store = interface.Attribute(u"store")
 
     def getPrincipalByRpxNowIdentifier(identifier):
-        """ Get principal id by her OpenID identifier. Return None if
+        """ Get principal id by her RpxNow identifier. Return None if
         principal with given identifier does not exist. """
 
 

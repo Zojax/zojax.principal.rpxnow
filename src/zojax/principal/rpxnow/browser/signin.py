@@ -51,7 +51,7 @@ class RpxNowSignIn(object):
         identifier = request.get('rpxnow_identifier')
         if not identifier:
             IStatusMessage(request).add(
-                _(u"Please specify your OpenID identifier."))
+                _(u"Please specify your RpxNow identifier."))
             request.response.redirect(siteURL)
             return u''
 

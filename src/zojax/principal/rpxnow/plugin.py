@@ -176,7 +176,7 @@ class AuthenticatorPlugin(BTreeContainer):
                 return RpxNowPrincipalInfo(id, internal)
 
     def getPrincipalByRpxNowIdentifier(self, identifier):
-        """ return principal info by OpenID Identifier """
+        """ return principal info by RpxNow Identifier """
         if identifier in self.__id_by_identifier:
             return self.__id_by_identifier.get(identifier)
 

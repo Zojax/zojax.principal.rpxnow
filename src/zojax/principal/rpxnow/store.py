@@ -22,13 +22,13 @@ from BTrees.OIBTree import OITreeSet
 
 from rpxnow.association import Association
 from rpxnow.store.nonce import SKEW
-from rpxnow.store.interface import OpenIDStore
+from rpxnow.store.interface import RpxNowStore
 
 
-class ZopeStore(OpenIDStore):
-    """Zope OpenID store.
+class ZopeStore(RpxNowStore):
+    """Zope RpxNow store.
 
-    This class implements an OpenID store which uses the ZODB."""
+    This class implements an RpxNow store which uses the ZODB."""
     def __init__(self):
         self.handles = OOBTree()
         self.nonces = OITreeSet()
