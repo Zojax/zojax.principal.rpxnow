@@ -28,26 +28,14 @@ from zojax.principal.rpxnow.interfaces import IRPXNowAuthenticationProduct
 
 
 script = r"""
-<script src="http://www.google.com/jsapi"></script>
-
 <script type="text/javascript">
-  google.load('friendconnect', '0.8');
+  var rpxJsHost = (("https:" == document.location.protocol) ? "https://" : "http://static.");
+  document.write(unescape("%3Cscript src='" + rpxJsHost +
+"rpxnow.com/js/lib/rpx.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
-
-<script>
-google.friendconnect.container.initOpenSocialApi({
-  site: '%(siteId)s',
-  onload: function() {
-    if (!window.timesloaded) {
-      window.timesloaded = 1;
-    } else {
-      window.timesloaded++;
-    }
-    if (window.timesloaded > 1) {
-      window.top.location.href = "%(successURL)s";
-    }
-  }
-});
+<script type="text/javascript">
+  RPXNOW.overlay = true;
+  RPXNOW.language_preference = 'en';
 </script>
 """
 
@@ -56,8 +44,6 @@ class RPXNow(HTMLSourcePortlet):
     def update(self):
         super(RPXNow, self).update()
         product = component.getUtility(IRPXNowAuthenticationProduct)
-
-#        source = script % dict(siteId=product.siteId,
-#                               successURL='%s/login-success.html'%absoluteURL(getSite(), self.request))
-#        if source not in library.includes.sources:
-#            library.includeInplaceSource(source)
+        source = script % dict(successURL='%s/login-success.html'%absoluteURL(getSite(), self.request))
+        if source not in library.includes.sources:
+            library.includeInplaceSource(source)
