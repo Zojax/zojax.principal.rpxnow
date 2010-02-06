@@ -44,6 +44,6 @@ class RPXNow(HTMLSourcePortlet):
     def update(self):
         super(RPXNow, self).update()
         product = component.getUtility(IRPXNowAuthenticationProduct)
-        source = script % dict(successURL='%s/login-success.html'%absoluteURL(getSite(), self.request))
+        source = script
         if source not in library.includes.sources:
             library.includeInplaceSource(source)
