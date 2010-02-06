@@ -35,8 +35,6 @@ class IRPXNowAuthenticationProduct(interface.Interface):
                                 default=u'https://rpxnow.com/api/v2',
                                 required=True,)
 
-    cookieNames = interface.Attribute(u"Cookie name")
-
 
 class IRPXNowPrincipal(interface.Interface):
     """ rpxnow principal """
