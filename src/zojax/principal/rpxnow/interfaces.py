@@ -32,7 +32,7 @@ class IRPXNowAuthenticationProduct(interface.Interface):
                                   required=True,)
 
     rpcURL = schema.TextLine(title=_(u"RPC url"),
-                                default=u'http://rpxnow.com/api/v2',
+                                default=u'https://rpxnow.com/api/v2',
                                 required=True,)
 
     cookieNames = interface.Attribute(u"Cookie name")
