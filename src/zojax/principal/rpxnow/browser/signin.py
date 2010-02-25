@@ -22,7 +22,8 @@ from zope.traversing.browser import absoluteURL
 from zope.app.component.hooks import getSite
 from zope.app.security.interfaces import \
     IAuthentication, IUnauthenticatedPrincipal
-
+    
+from zojax.authentication.interfaces import ILoginService
 from zojax.statusmessage.interfaces import IStatusMessage
 
 from zojax.principal.rpxnow.interfaces import _
@@ -31,24 +32,23 @@ from zojax.principal.rpxnow.plugin import SESSION_KEY
 
 class RPXNowSignIn(object):
 
-    def __call__(self):
+    def __call__(self, *args, **kw):
+        context = self.context
         request = self.request
-        siteURL = u'%s/'%absoluteURL(getSite(), request)
+        principal = request.principal
+        auth = getUtility(IAuthentication)
 
-        if not IUnauthenticatedPrincipal.providedBy(request.principal):
-            request.response.redirect(siteURL)
-            return u''
+        if IUnauthenticatedPrincipal.providedBy(principal):
+            msg = auth.loginMessage
+            if not msg:
+                msg = _('Login failed.')
 
-        if not 'token' in request:
-            request.response.redirect(siteURL)
-            return u''
+            IStatusMessage(request).add(msg, 'warning')
 
-        token = request.get('token')
-        if not token:
-            IStatusMessage(request).add(
-                _(u"Please specify your token."))
-            request.response.redirect(siteURL)
-            return u''
-        session = ISession(request)[SESSION_KEY]['token'] = token
-        request.response.redirect(siteURL)
+            request.response.redirect(u'%s/login.html'%absoluteURL(context, request))
+        elif 'token' in request:
+            if getMultiAdapter((auth, request), ILoginService).success():
+                return u''
+
+        request.response.redirect(u'%s/'%absoluteURL(getSite(), request))
         return u''

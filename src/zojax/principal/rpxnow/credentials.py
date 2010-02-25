@@ -51,10 +51,14 @@ class CredentialsPlugin(Persistent):
         Any other return value is treated as valid credentials.
         """
         token = ISession(request)[SESSION_KEY].get('token')
-        if token:
-            return RPXNowCredentials(token)
-        return None
-
+        if not token:
+            token = request.get('token')
+            if token:
+                ISession(request)[SESSION_KEY]['token'] = token
+                return RPXNowCredentials(token)
+            return None
+        return RPXNowCredentials(token)
+    
 
 credentialsFactory = CredentialsPluginFactory(
     "credentials.rpxnow", CredentialsPlugin, (),
