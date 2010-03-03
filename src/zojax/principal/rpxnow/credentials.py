@@ -74,12 +74,12 @@ def installCredentialsPlugin(plugin, ev):
     event.notify(ObjectCreatedEvent(plugin))
 
     auth = removeSecurityProxy(auth)
-    if 'credendials.rpxnow' in auth:
-        del auth['credendials.rpxnow']
+    if 'credentials.rpxnow' in auth:
+        del auth['credentials.rpxnow']
 
-    auth['credendials.rpxnow'] = plugin
+    auth['credentials.rpxnow'] = plugin
     auth.credentialsPlugins = tuple(auth.credentialsPlugins) + \
-        ('credendials.rpxnow',)
+        ('credentials.rpxnow',)
 
 
 @component.adapter(IRPXNowUsersPlugin, IObjectRemovedEvent)
@@ -87,9 +87,9 @@ def uninstallCredentialsPlugin(plugin, ev):
     auth = getUtility(IAuthentication)
 
     plugins = list(auth.credentialsPlugins)
-    if 'credendials.rpxnow' in plugins:
-        plugins.remove('credendials.rpxnow')
+    if 'credentials.rpxnow' in plugins:
+        plugins.remove('credentials.rpxnow')
         auth.credentialsPlugins = tuple(plugins)
 
-    if 'credendials.rpxnow' in auth:
-        del auth['credendials.rpxnow']
+    if 'credentials.rpxnow' in auth:
+        del auth['credentials.rpxnow']
