@@ -31,13 +31,13 @@
      permission="zope.Public" />
      
   <browser:page
-     for="*"
+     for="zope.app.component.interfaces.ISite"
      name="rpxNowSignIn"
      permission="zope.Public"
      class=".signin.RPXNowSignIn"/>
      
   <browser:page
-    for="zojax.portal.interfaces.IPortal"
+    for="zope.app.component.interfaces.ISite"
     name="rpx_xdcomm.html"
     permission="zope.Public"
     template="rpx_xdcomm.pt" />
