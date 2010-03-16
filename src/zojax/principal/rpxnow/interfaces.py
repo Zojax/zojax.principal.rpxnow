@@ -44,6 +44,8 @@ class IRPXNowPrincipal(interface.Interface):
         required = True)
 
     identifier = interface.Attribute('OpenID Identifier')
+    
+    id = interface.Attribute('id')
 
 
 class IRPXNowPrincipalInfo(IPrincipalInfo):
