@@ -11,7 +11,7 @@
   
   <div id="rpxnow-auth">
     <a class="rpxnow" onclick="return false;"
-       tal:attributes="href view/signInLink"> Sign In with RPX Now </a>
+       tal:attributes="href view/signInLink" i18n:translate=""> Sign In with RPX Now </a>
   </div>
   
 </tal:block>
