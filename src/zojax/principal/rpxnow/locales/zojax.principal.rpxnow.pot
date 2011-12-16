@@ -1,0 +1,86 @@
+##############################################################################
+#
+# Copyright (c) 2003-2004 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+msgid ""
+msgstr ""
+"Project-Id-Version: Development/Unknown\n"
+"POT-Creation-Date: Thu Dec  8 22:14:48 2011\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Zope 3 Developers <zope3-dev@zope.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: zope/app/locales/extract.py\n"
+
+#: src/zojax/principal/rpxnow/browser/login.pt:13
+msgid "Sign In with RPX Now"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/browser/remove.pt:11
+msgid "Remove"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/browser/remove.pt:2
+msgid "Remove user"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/browser/remove.pt:6
+msgid "Are you sure you want remove this user?"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/browser/remove.py:51
+msgid "User has been removed."
+msgstr ""
+
+#: src/zojax/principal/rpxnow/browser/rpx_xdcomm.pt:5
+msgid "Cross-Domain Receiver Page"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/browser/signin.py:44
+msgid "Login failed."
+msgstr ""
+
+#: src/zojax/principal/rpxnow/credentials.py:65
+msgid "RPX Now credentials plugin"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/interfaces.py:31
+msgid "API key"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/interfaces.py:34
+msgid "RPC url"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/interfaces.py:43
+#: src/zojax/principal/rpxnow/interfaces.py:78
+msgid "Title"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/interfaces.py:82
+msgid "Prefix"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/interfaces.py:83
+msgid "Prefix to be added to all principal ids to assure that all ids are unique within the authentication service"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/plugin.py:229
+msgid "RPX Now plugin"
+msgstr ""
+
+#: src/zojax/principal/rpxnow/plugin.py:230
+msgid "This plugin allow use rpxnow login like google, yahoo, lifejournal and many others"
+msgstr ""
+
